@@ -1,1 +1,10 @@
 /* All style elements for your extension go here */
+
+.edit-btn, .delete-btn {
+  margin: 5px;
+  padding: 3px 6px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.edit-btn { background-color: #4CAF50; color: white; }
+.delete-btn { background-color: #f44336; color: white; }
