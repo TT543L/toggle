@@ -1,63 +1,35 @@
-// The main script for the extension
-// The following are examples of some basic extension functionality
+const findRegex = /\s*\/\/\s*([^|]+?)\|([\s\S]+?)\/\/\s*/g;
 
-//You'll likely need to import extension_settings, getContext, and loadExtensionSettings from extensions.js
-import { extension_settings, getContext, loadExtensionSettings } from "../../../extensions.js";
+const replaceWith = `
+  <details class="editable-toggle">
+    <summary>$1</summary>
+    <div class="toggle-content">$2</div>
+    <button class="edit-btn">편집</button>
+    <button class="delete-btn">삭제</button>
+  </details>
+`;
 
-//You'll likely need to import some other functions from the main script
-import { saveSettingsDebounced } from "../../../../script.js";
+document.addEventListener("DOMContentLoaded", () => {
+  // 편집 버튼 클릭 시
+  document.body.addEventListener("click", (event) => {
+    if (event.target.classList.contains("edit-btn")) {
+      const toggle = event.target.closest(".editable-toggle");
+      const contentDiv = toggle.querySelector(".toggle-content");
 
-// Keep track of where your extension is located, name should match repo name
-const extensionName = "st-extension-example";
-const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
-const extensionSettings = extension_settings[extensionName];
-const defaultSettings = {};
+      // 기존 내용 가져오기
+      const currentText = contentDiv.innerHTML;
 
+      // 편집 입력창 표시
+      const newText = prompt("새로운 내용을 입력하세요:", currentText);
+      if (newText !== null) {
+        contentDiv.innerHTML = newText;
+      }
+    }
 
- 
-// Loads the extension settings if they exist, otherwise initializes them to the defaults.
-async function loadSettings() {
-  //Create the settings if they don't exist
-  extension_settings[extensionName] = extension_settings[extensionName] || {};
-  if (Object.keys(extension_settings[extensionName]).length === 0) {
-    Object.assign(extension_settings[extensionName], defaultSettings);
-  }
-
-  // Updating settings in the UI
-  $("#example_setting").prop("checked", extension_settings[extensionName].example_setting).trigger("input");
-}
-
-// This function is called when the extension settings are changed in the UI
-function onExampleInput(event) {
-  const value = Boolean($(event.target).prop("checked"));
-  extension_settings[extensionName].example_setting = value;
-  saveSettingsDebounced();
-}
-
-// This function is called when the button is clicked
-function onButtonClick() {
-  // You can do whatever you want here
-  // Let's make a popup appear with the checked setting
-  toastr.info(
-    `The checkbox is ${extension_settings[extensionName].example_setting ? "checked" : "not checked"}`,
-    "A popup appeared because you clicked the button!"
-  );
-}
-
-// This function is called when the extension is loaded
-jQuery(async () => {
-  // This is an example of loading HTML from a file
-  const settingsHtml = await $.get(`${extensionFolderPath}/example.html`);
-
-  // Append settingsHtml to extensions_settings
-  // extension_settings and extensions_settings2 are the left and right columns of the settings menu
-  // Left should be extensions that deal with system functions and right should be visual/UI related 
-  $("#extensions_settings").append(settingsHtml);
-
-  // These are examples of listening for events
-  $("#my_button").on("click", onButtonClick);
-  $("#example_setting").on("input", onExampleInput);
-
-  // Load settings when starting things up (if you have any)
-  loadSettings();
+    // 삭제 버튼 클릭 시
+    if (event.target.classList.contains("delete-btn")) {
+      const toggle = event.target.closest(".editable-toggle");
+      toggle.remove(); // 해당 토글만 삭제
+    }
+  });
 });
