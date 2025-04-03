@@ -1,5 +1,5 @@
+// 정규식 정의 (특정 형식의 텍스트 찾기)
 const findRegex = /\s*\/\/\s*([^|]+?)\|([\s\S]+?)\/\/\s*/g;
-
 const replaceWith = `
   <details class="editable-toggle">
     <summary>$1</summary>
@@ -9,8 +9,15 @@ const replaceWith = `
   </details>
 `;
 
+// 확장이 실행될 때 토글 기능을 적용하는 함수
+function applyToggle() {
+  document.querySelectorAll(".mes_text").forEach((element) => {
+    element.innerHTML = element.innerHTML.replace(findRegex, replaceWith);
+  });
+}
+
+// 편집 및 삭제 기능 추가
 document.addEventListener("DOMContentLoaded", () => {
-  // 편집 버튼 클릭 시
   document.body.addEventListener("click", (event) => {
     if (event.target.classList.contains("edit-btn")) {
       const toggle = event.target.closest(".editable-toggle");
@@ -32,4 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
       toggle.remove(); // 해당 토글만 삭제
     }
   });
+
+  // "적용" 버튼을 눌렀을 때 실행
+  document.getElementById("apply_toggle")?.addEventListener("click", applyToggle);
 });
